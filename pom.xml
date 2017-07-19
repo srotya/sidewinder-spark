@@ -8,7 +8,7 @@
   </parent>
   <groupId>com.srotya.sidewinder</groupId>
   <artifactId>sidewinder-spark</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>sidewinder-spark</name>
   <description>Sidewinder data source for Spark</description>
@@ -107,6 +107,6 @@
     <connection>scm:git:git@github.com:srotya/sidewinder-spark.git</connection>
     <developerConnection>scm:git:git@github.com:srotya/sidewinder-spark.git</developerConnection>
     <url>https://github.com/srotya/sidewinder-spark.git</url>
-    <tag>sidewinder-spark-0.0.1</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
