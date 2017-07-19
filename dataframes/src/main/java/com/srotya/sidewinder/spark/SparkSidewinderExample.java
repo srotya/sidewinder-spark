@@ -15,6 +15,21 @@
  */
 package com.srotya.sidewinder.spark;
 
-public class TestClass {
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.SQLContext;
+
+public class SparkSidewinderExample {
+
+	public static void main(String[] args) {
+		JavaSparkContext ctx = new JavaSparkContext("local[*]", "sql-test");
+		SQLContext sqlContext = new SQLContext(ctx);
+
+		DataFrame df = sqlContext.baseRelationToDataFrame(
+				new SidewinderDataFrame(sqlContext, new scala.collection.immutable.HashMap<String, String>()));
+		df.registerTempTable("root");
+		sqlContext.sql("select * from root where timestamp>1").show();
+		ctx.close();
+	}
 
 }

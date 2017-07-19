@@ -1,0 +1,29 @@
+language: java
+jdk:
+- oraclejdk8
+install: true
+addons:
+  apt:
+    packages:
+    - rpm
+    - wget
+    - unzip
+before_script:
+- DIR=$(pwd);mkdir /tmp/proto;cd /tmp/proto;wget https://github.com/google/protobuf/releases/download/v3.2.0/protoc-3.2.0-linux-x86_64.zip;unzip
+  protoc-3.2.0-linux-x86_64.zip; ls -lh;cd $DIR
+script: mvn -q -T2 clean test
+after_success:
+- bash <(curl -s https://codecov.io/bash)
+- cp build/conditionalbuild.sh /tmp/
+- chmod a+x /tmp/conditionalbuild.sh
+- /tmp/conditionalbuild.sh
+env:
+  global:
+  - REPO=git@github.com:srotya/sidewinder-spark.git
+  - secure: X+r0tZ+I5O5wPPgJ/+DFUdrUMuuz3icktJ8WjoVBX5OZ61mCI+UpYrpiwGcO2O/nZAAMJiIdVQ2fjBEDoHgt4IcjIZJHs1s4WjgB3Oo3fJGGLjZXtNxuFongO9y8+ez+9NJkDVEU6tzkFgsRgWYag5Qh8Sh/J/t8EKRRRYbDYiccoAVXYRhtWUMzhs9tZC7qX5yiG/0cJzoNlZZGS4KzzjvLikjYiHZ9zY8T3R64GH5OKA0NOwGbldW/1ud1V8AJYZSg3IVr2JirdkbTIk1xVey2eZpTZ0s3RC8Cyxp2DJRn8i7AhPhrIXj9jAnAV6E+FLxJ9CZEKB8d6BJlo3rXjuEOjwv8eXf0ms08TXyblqE12VbMCEmKHGECT9PeTthctGLD47D25Zqf6XfaoCkjNWUZIdMBGm50IOVX9qlXh4P+AP4Qj5apXQPBp+msfhLYAtslVFuqnm5vk73H1N07XuJKUK8U+2MswpyQGT4uzvweBx+7mx639LZergdy+JieyoWlxNIijGsF9ujHBz6egZt9XhQUdF2UddLS9BXfoMLEVlAffsjv6sR6+JI79JfS5DiypPEU6bpBcoJlHCo5HJIIizV1WQCYsor9wo3eoILFk1Nzcylecaezwht3v5zmy5GB0o6UTLyNqVdUSEoo0bo7aFyLv5J1UyG+WuBNV3E=
+  - secure: Fis2a+SvtO27GW1F+ekB3KPGlCAXpe8M2lLSyS2wEKWZG9omI4uE72qcFtpwQMuQa271HlzRrtXbUz4ofuId660O7RQcwcJvJpbBNGrAJ72tx1Emw4zFj9VGRAqpReoVuyUjy2N/f+TwswtaUiWGG64AkcMRZnu8fvG01+c3lRfK+Bz4OLiJPS+5ymC0tzDa+xTr3XSq9dAQl1c5oewtpcpjYZJE4J3l/H69Bh71ylrlNy0GIkISy//2LT1L1X9fwOYuswBUiVyqE/mjTF64lY9QE2SEoQlEGiOfxdpnWeEIdNueZueJJXSQEfVVpq54M4y+r/l3LpJ+wMex/UaUQ+MF+5nbjmRM6elR3VRYI4Z4aLCoc7q76sQbKx+/Sb+b1gStG9HtdZcofQBE/f9ynzsLLm1+r3jxnocusdbVrF4w8i6/FHZBMyOuLZLZY5+HNZbfuyeESM+XnMvycPClSdWaXIKKVGgem1BzsCGNDDInJ+AwSBEQHbIP6oZxuKoA2l9VY2VpmrWlRfBuuZm4F5UQfjp3oczLzJNTRx3cKfYsdpa3FeZOaF8TXNu20ylNd3g1c/B2tItHNHc5Ho8DVMWfWNQwAFxZX94sdmPEMvX3oJrN1I+8IBTRxP/WJGtaMTw/6Ayy0LpSEFMibsiMXvUKOrAOSbnuIcRVzJhI7o8=
+  - secure: aRkvOGgdXEspmnzl+Dne9jSa0F8XtdGaZq94EsCBiWfra9wqTaRdpJnuduvNveZRUBKnKojmRzHEXhc8ObVQLciPfR0E1sg6apM3ZThuPUXiagcsmiDWxd5cmftPDdR6zurJp/6WoKtfxL4awZ9MTR5A5v0mFAWs9guywaKNfnGU87r+EOfn/jgyVriXpwKGXpjvxdDY7RVbxXNoG0Dx5366tXk2fjohH9vAK2d9F3vHxznVYDGch2zHuMfQGqJjscomEdR1522yH7QyXE9zkm+WKf0nyhslUM6sIG46Sv/QcANnz8RZEZNFClGMeF+FVbwPGH7tZovqeTEIn+G8quln35suyuzIzPHK/3rcBoBM16nGz1cIuOq5s0AwbBccpvxEtWg/YTftgKyhqyf5MvtE02mGlNPdm5z0t6/5yIGas283qM8HD1jWW8Nm8E7JDKUXTYJSavQe67Oi2WPTwspOQSZvG9K7gUODFA6XclY8lJeuJlBaa7Zim0EqfUSkK0r7qsl1ghOsB3Ua0x5fVQxk1IQxbvlvqPJi9jMyWQ15IAjSfO/I54d6RruUVazYe3biNj7ag4+yyhGUXX5yskX9GyV/gBZQjM5U6EOXejwyhxW6s4GXojG+KBx8XDgWh4wepC24t+1vbBYesy/qnoNdCxQ3zJkgufei0tJT0N8=
+  - secure: XhiGZrfmLgQbcXk3ZICaEwTJBg/JCWzHKmxOSBd7FXExoZR6YFFZBfvnd3AR+1re32J+vA6nGV8f+dpg5Ye0qPVHTcVkkJMlOlUrRoQ1x7wK4G+VNm8KAXcAO89kHGddz7ApXmiFJPv2xnikdz9XMda0pU5TdISYGUvih3TMw7Fu4XfBePSAFEOuoa4PbrwHnTUSCuap0Ds/UMNslu+NWYFdS2Ai8nhOXErwUkVqS0jjejszpshUZVxl/WAhtOIRzLadIu+jJi+HfiYGICaesiosiC7xMyYYEj/6hquHGtmQ2bH/NA1Mbs9arD46FKGDWV7CsZ54EgBKWwyuLigewOkBMiJKseaDVjdWjniTdNJaEMp3+iG+F+TzJR1BiNwpuy3+hnLiyoe4QDy8xoRjR5Z+YA1Oq26J4Nlpt/W54rs4Ni+B1CJ8t7tOHj+5EUZdKRA44GbaAfT7/KMyGAme3aHlIYYxgFXX1xDAF9MnH7vSfNkZ7Qvh7VZCm9a/BD8+sXLLjq05mEyXvas3FAi+TGL3POB4uJ+VuF4cBXxP+fQC8L8XHbM53vX4FNs/SYhNzW0NV3nGfqfK17+xR99C5TIcxyn4OH97juGz+oOp+fwsGH09HWceFLIuJSCC1q8RCAgUyfPbqHhh7GqcUgqqDLxEaat5MxjbgX0Io4dJvjY=
+cache:
+  directories:
+  - $HOME/.m2
