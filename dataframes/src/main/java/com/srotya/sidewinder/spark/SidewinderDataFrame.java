@@ -32,6 +32,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
+import scala.collection.JavaConversions;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.Map;
 
@@ -41,21 +42,36 @@ public class SidewinderDataFrame extends BaseRelation
 	private static final long serialVersionUID = 1L;
 
 	private transient SQLContext context;
+	private String dbname;
+	private String measurement;
+	private String url;
+	private String baseUrl;
+
+	protected SidewinderDataFrame() {
+	}
 
 	public SidewinderDataFrame(SQLContext context, Map<String, String> configs) {
 		this.context = context;
+		java.util.Map<String, String> map = JavaConversions.mapAsJavaMap(configs);
+		url = map.get("url");
+		dbname = map.get("database.name");
+		measurement = map.get("measurement.name");
+		baseUrl = url + "/databases/" + dbname + "/measurements/" + measurement;
 	}
 
 	@Override
 	public StructType schema() {
 		Metadata md = new Metadata(new HashMap<>());
-		StructField[] sf = new StructField[] { new StructField("measurement", DataTypes.StringType, false, md),
-				new StructField("valuefield", DataTypes.StringType, false, md),
-				new StructField("tags", DataTypes.createArrayType(DataTypes.StringType), false, md),
+		StructField[] sf = new StructField[] { 
 				new StructField("timestamp", DataTypes.LongType, false, md),
 				new StructField("value", DataTypes.LongType, false, md),
-				new StructField("fp", DataTypes.BooleanType, false, md), };
-		return new StructType(sf);
+				new StructField("valuefield", DataTypes.StringType, false, md),
+				new StructField("tags", DataTypes.createArrayType(DataTypes.StringType), false, md),
+				new StructField("fp", DataTypes.BooleanType, false, md)
+		};
+
+	return new StructType(sf);
+
 	}
 
 	@Override
@@ -69,21 +85,21 @@ public class SidewinderDataFrame extends BaseRelation
 	}
 
 	@Override
-	public RDD<Row> buildScan(String[] arg0, Filter[] filter) {
-		System.out.println("RDD filter:" + Arrays.asList(arg0) + "\tFilter:" + Arrays.toString(filter));
-		return new SidewinderRDD(context.sparkContext());
+	public RDD<Row> buildScan(String[] fields, Filter[] filters) {
+		System.out.println("RDD filter:" + Arrays.asList(fields) + "\tFilter:" + Arrays.toString(filters));
+		return new SidewinderRDD(context.sparkContext(), url, dbname, measurement, fields, this);
 	}
 
 	@Override
 	public RDD<Row> buildScan() {
 		System.out.println("RDD");
-		return new SidewinderRDD(context.sparkContext());
+		return new SidewinderRDD(context.sparkContext(), url, dbname, measurement, null, this);
 	}
 
 	@Override
-	public RDD<Row> buildScan(String[] arg0) {
-		System.out.println("RDD no filter:" + Arrays.asList(arg0));
-		return new SidewinderRDD(context.sparkContext());
+	public RDD<Row> buildScan(String[] fields) {
+		System.out.println("RDD no filter:" + Arrays.asList(fields));
+		return new SidewinderRDD(context.sparkContext(), url, dbname, measurement, fields, this);
 	}
 
 }

@@ -15,16 +15,32 @@
  */
 package com.srotya.sidewinder.spark;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.avro.generic.GenericRecordBuilder;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRow;
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
+import org.apache.spark.sql.types.StructType;
 
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
@@ -33,11 +49,18 @@ import scala.collection.JavaConversions;
  * @author ambud
  */
 public final class SidewinderRDD extends RDD<Row> {
-	
-	private static final long serialVersionUID = 1L;
 
-	public SidewinderRDD(SparkContext _sc) {
+	private static final long serialVersionUID = 1L;
+	private String baseUrl;
+	private SidewinderDataFrame schemaProvider;
+	private String[] fields;
+
+	public SidewinderRDD(SparkContext _sc, String url, String dbname, String measurement, String[] fields,
+			SidewinderDataFrame schemaProvider) {
 		super(_sc, JavaConversions.asScalaBuffer(Arrays.asList()), scala.reflect.ClassTag$.MODULE$.apply(Row.class));
+		this.fields = fields;
+		this.schemaProvider = schemaProvider;
+		baseUrl = url + "/databases/" + dbname + "/measurements/" + measurement;
 	}
 
 	@Override
@@ -55,11 +78,35 @@ public final class SidewinderRDD extends RDD<Row> {
 
 	@Override
 	public Iterator<Row> compute(Partition arg0, TaskContext ctx) {
+		StructType schema = schemaProvider.schema();
 		List<Row> objs = new ArrayList<>();
-		for (int i = 0; i < 100; i++) {
-			objs.add(new GenericRow(new Object[] { "cpu1", "valu1", new String[] { "testtes2" },
-					System.currentTimeMillis(), 1L, false }));
+		for (long i = 0; i < 100; i++) {
+			GenericRowWithSchema row = new GenericRowWithSchema();
+			objs.add(new GenericRow(
+					new Object[] { System.currentTimeMillis(), i, "value", new String[] { "testtes2" }, false }));
 		}
 		return JavaConversions.asScalaIterator(objs.iterator());
+	}
+
+	public static CloseableHttpResponse makeRequest(HttpRequestBase request) throws KeyManagementException,
+			ClientProtocolException, NoSuchAlgorithmException, KeyStoreException, MalformedURLException, IOException {
+		return buildClient(request.getURI().toURL().toString(), 1000, 1000, null).execute(request);
+	}
+
+	public static CloseableHttpResponse makeRequestAuthenticated(HttpRequestBase request, CredentialsProvider provider)
+			throws KeyManagementException, ClientProtocolException, NoSuchAlgorithmException, KeyStoreException,
+			MalformedURLException, IOException {
+		return buildClient(request.getURI().toURL().toString(), 1000, 1000, provider).execute(request);
+	}
+
+	public static CloseableHttpClient buildClient(String baseURL, int connectTimeout, int requestTimeout,
+			CredentialsProvider provider) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+		HttpClientBuilder clientBuilder = HttpClients.custom();
+		if (provider != null) {
+			clientBuilder.setDefaultCredentialsProvider(provider);
+		}
+		RequestConfig config = RequestConfig.custom().setConnectTimeout(connectTimeout)
+				.setConnectionRequestTimeout(requestTimeout).setAuthenticationEnabled(true).build();
+		return clientBuilder.setDefaultRequestConfig(config).build();
 	}
 }

@@ -14,6 +14,7 @@
   <description>Sidewinder data source for Spark</description>
   <modules>
     <module>dataframes</module>
+    <module>metrics-sink-spark1x</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
