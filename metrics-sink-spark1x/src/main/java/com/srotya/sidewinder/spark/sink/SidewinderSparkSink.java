@@ -104,27 +104,27 @@ public class SidewinderSparkSink implements Sink {
 			for (Entry<String, Gauge> entry : gauges.entrySet()) {
 				String k = entry.getKey();
 				Object value = entry.getValue().getValue();
-				extracted(ts, builder, k, value);
+				extracted(ts, builder, k, "gauge", value);
 			}
 			for (Entry<String, Counter> entry : counters.entrySet()) {
 				String k = entry.getKey();
 				Object value = entry.getValue().getCount();
-				extracted(ts, builder, k, value);
+				extracted(ts, builder, k, "counter", value);
 			}
 			for (Entry<String, Histogram> entry : histograms.entrySet()) {
 				String k = entry.getKey();
 				Object value = entry.getValue().getCount();
-				extracted(ts, builder, k, value);
+				extracted(ts, builder, k, "histogram", value);
 			}
 			for (Entry<String, Meter> entry : meters.entrySet()) {
 				String k = entry.getKey();
 				Object value = entry.getValue().getCount();
-				extracted(ts, builder, k, value);
+				extracted(ts, builder, k, "meter", value);
 			}
 			for (Entry<String, Timer> entry : timers.entrySet()) {
 				String k = entry.getKey();
 				Object value = entry.getValue().getCount();
-				extracted(ts, builder, k, value);
+				extracted(ts, builder, k, "timer", value);
 			}
 			try {
 				String payload = builder.toString().trim();
@@ -142,10 +142,9 @@ public class SidewinderSparkSink implements Sink {
 			}
 		}
 
-		public static void extracted(long ts, StringBuilder builder, String k, Object value) {
+		public static void extracted(long ts, StringBuilder builder, String type, String k, Object value) {
 			String[] key = k.split("\\.");
 			String appId = key[0];
-			String type = "gauge";
 			String component = key[1];
 			String valueField = key[key.length - 1];
 			List<String> tags = new ArrayList<>();
