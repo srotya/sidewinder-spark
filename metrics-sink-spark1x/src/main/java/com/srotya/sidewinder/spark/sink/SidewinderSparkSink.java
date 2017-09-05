@@ -15,9 +15,6 @@
  */
 package com.srotya.sidewinder.spark.sink;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -27,14 +24,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.http.StatusLine;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.spark.SecurityManager;
 import org.apache.spark.metrics.MetricsSystem;
 import org.apache.spark.metrics.sink.Sink;
@@ -128,13 +120,13 @@ public class SidewinderSparkSink implements Sink {
 			}
 			try {
 				String payload = builder.toString().trim();
-				if(payload.length()==0) {
+				if (payload.length() == 0) {
 					System.out.println("Empty metrics request ignoring");
 					return;
 				}
-				StatusLine response = putData(url, payload);
+				int response = putData(url, payload);
 				System.out.println("\n\nResponse:" + response);
-				if (response.getStatusCode() == 400) {
+				if (response == 400) {
 					System.out.println("Bad data:\n" + payload);
 				}
 			} catch (Exception e) {
@@ -171,21 +163,11 @@ public class SidewinderSparkSink implements Sink {
 			builder.append(" " + ts + "\n");
 		}
 
-		public static StatusLine putData(String url, String data) throws Exception {
-			CloseableHttpClient client = buildClient(url, 5000, 30000);
-			HttpPost post = new HttpPost(url);
-			post.setEntity(new StringEntity(data));
-			CloseableHttpResponse response = client.execute(post);
-			client.close();
-			return response.getStatusLine();
-		}
-
-		public static CloseableHttpClient buildClient(String baseURL, int connectTimeout, int requestTimeout)
-				throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-			HttpClientBuilder clientBuilder = HttpClients.custom();
-			RequestConfig config = RequestConfig.custom().setConnectTimeout(connectTimeout)
-					.setConnectionRequestTimeout(requestTimeout).build();
-			return clientBuilder.setDefaultRequestConfig(config).build();
+		public static int putData(String url, String data) throws Exception {
+			HttpClient client = new HttpClient();
+			PostMethod method = new PostMethod(url);
+			method.setRequestEntity(new StringRequestEntity(data, "text/html", "utf-8"));
+			return client.executeMethod(method);
 		}
 
 	}

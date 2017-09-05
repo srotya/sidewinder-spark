@@ -20,26 +20,21 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.srotya.sidewinder</groupId>
-      <artifactId>sidewinder-core</artifactId>
-      <version>0.0.26</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.5.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.11</artifactId>
       <version>1.6.3</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.srotya.sidewinder</groupId>
+    	<artifactId>sidewinder-core</artifactId>
+    	<version>0.0.26</version>
+    	<scope>test</scope>
     </dependency>
   </dependencies>
   <build>
