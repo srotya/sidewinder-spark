@@ -62,7 +62,7 @@ public class SidewinderSparkSink implements Sink {
 
 	@Override
 	public void report() {
-//		sidewinderReporter.report();
+		// sidewinderReporter.report();
 		System.out.println("Report");
 	}
 
@@ -137,6 +137,10 @@ public class SidewinderSparkSink implements Sink {
 
 		public static void extracted(long ts, StringBuilder builder, String type, String k, Object value) {
 			String[] key = k.split("\\.");
+			System.out.println("Key:" + key);
+			if (key.length < 2) {
+				return;
+			}
 			String appId = key[0];
 			String component = key[1];
 			String valueField = key[key.length - 1];
