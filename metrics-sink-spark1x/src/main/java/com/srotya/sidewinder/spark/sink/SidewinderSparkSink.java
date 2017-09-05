@@ -127,10 +127,15 @@ public class SidewinderSparkSink implements Sink {
 				extracted(ts, builder, k, value);
 			}
 			try {
-				StatusLine response = putData(url, builder.toString());
+				String payload = builder.toString().trim();
+				if(payload.length()==0) {
+					System.out.println("Empty metrics request ignoring");
+					return;
+				}
+				StatusLine response = putData(url, payload);
 				System.out.println("\n\nResponse:" + response);
 				if (response.getStatusCode() == 400) {
-					System.out.println("Bad data:\n" + builder.toString());
+					System.out.println("Bad data:\n" + payload);
 				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Error pushing metrics to Sidewinder", e);
