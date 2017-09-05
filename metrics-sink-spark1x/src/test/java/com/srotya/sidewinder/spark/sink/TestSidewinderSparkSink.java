@@ -35,7 +35,7 @@ public class TestSidewinderSparkSink {
 		long ts = System.currentTimeMillis();
 		StringBuilder builder = new StringBuilder();
 		String k = "application_1503944613984_0005.driver.jvm.pools.PS-Eden-Space.usage";
-		SidewinderReporter.extracted(ts * 1000 * 1000, builder, k, 0.123123);
+		SidewinderReporter.extracted(ts * 1000 * 1000, builder, "gauge", k, 0.123123);
 		List<DataPoint> points = HTTPDataPointDecoder.dataPointsFromString("db1", builder.toString());
 		assertEquals(1, points.size());
 		DataPoint dp = points.get(0);
@@ -48,10 +48,11 @@ public class TestSidewinderSparkSink {
 		assertTrue(dp.getTags().contains("jvm"));
 		assertTrue(dp.getTags().contains("pools"));
 		assertTrue(dp.getTags().contains("PS-Eden-Space"));
+		assertTrue(dp.getTags().contains("gauge"));
 
 		builder = new StringBuilder();
 		k = "application_1503944613984_0005.1.executor.jvm.pools.PS-Eden-Space.usage1";
-		SidewinderReporter.extracted(ts, builder, k, 32343);
+		SidewinderReporter.extracted(ts, builder, "meter", k, 32343);
 		points = HTTPDataPointDecoder.dataPointsFromString("db1", builder.toString());
 		assertEquals(1, points.size());
 		dp = points.get(0);
@@ -68,7 +69,7 @@ public class TestSidewinderSparkSink {
 
 		builder = new StringBuilder();
 		k = "application_1503944613984_0005.executor.jvm.pools.space.usage1";
-		SidewinderReporter.extracted(ts, builder, k, 32343);
+		SidewinderReporter.extracted(ts, builder, "test", k, 32343);
 		assertEquals(1, points.size());
 		points = HTTPDataPointDecoder.dataPointsFromString("db1", builder.toString());
 		dp = points.get(0);
