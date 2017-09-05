@@ -62,7 +62,8 @@ public class SidewinderSparkSink implements Sink {
 
 	@Override
 	public void report() {
-		sidewinderReporter.report();
+//		sidewinderReporter.report();
+		System.out.println("Report");
 	}
 
 	@Override
