@@ -23,8 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
-import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
@@ -54,11 +54,13 @@ public final class SidewinderRDD extends RDD<Row> {
 	private String baseUrl;
 	private SidewinderDataFrame schemaProvider;
 	private String[] fields;
+	private Entry<Long, Long> timeRangeFilter;
 
 	public SidewinderRDD(SparkContext _sc, String url, String dbname, String measurement, String[] fields,
-			SidewinderDataFrame schemaProvider) {
+			java.util.Map.Entry<Long, Long> timeRangeFilter, SidewinderDataFrame schemaProvider) {
 		super(_sc, JavaConversions.asScalaBuffer(Arrays.asList()), scala.reflect.ClassTag$.MODULE$.apply(Row.class));
 		this.fields = fields;
+		this.timeRangeFilter = timeRangeFilter;
 		this.schemaProvider = schemaProvider;
 		baseUrl = url + "/databases/" + dbname + "/measurements/" + measurement;
 	}
@@ -79,11 +81,14 @@ public final class SidewinderRDD extends RDD<Row> {
 	@Override
 	public Iterator<Row> compute(Partition arg0, TaskContext ctx) {
 		StructType schema = schemaProvider.schema();
+		System.out.println("Schema:" + schema);
+		// get data
+
 		List<Row> objs = new ArrayList<>();
 		for (long i = 0; i < 100; i++) {
 			GenericRowWithSchema row = new GenericRowWithSchema();
 			objs.add(new GenericRow(
-					new Object[] { System.currentTimeMillis(), i, "value", new String[] { "testtes2" }, false }));
+					new Object[] { System.currentTimeMillis(), new String[] { "testtes2" }, false, 13212L, "value" }));
 		}
 		return JavaConversions.asScalaIterator(objs.iterator());
 	}

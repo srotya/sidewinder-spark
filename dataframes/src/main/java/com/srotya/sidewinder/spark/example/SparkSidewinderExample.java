@@ -15,39 +15,29 @@
  */
 package com.srotya.sidewinder.spark.example;
 
-import org.apache.spark.api.java.JavaRDD;
+import java.util.Map;
+
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
 
 import com.srotya.sidewinder.spark.SidewinderDataFrame;
 
+import scala.collection.JavaConversions;
+
 public class SparkSidewinderExample {
 
 	public static void main(String[] args) {
 		JavaSparkContext ctx = new JavaSparkContext("local[*]", "sql-test");
-		
-		
-		JavaRDD<Object> rdd = ctx.emptyRDD();
-		JavaRDD<String> map = rdd.map(new Function<Object, String>() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public String call(Object v1) throws Exception {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		});
 		SQLContext sqlContext = new SQLContext(ctx);
 
-		DataFrame df = sqlContext.baseRelationToDataFrame(
-				new SidewinderDataFrame(sqlContext, new scala.collection.immutable.HashMap<String, String>()));
+		Map<String, String> config = new java.util.HashMap<>();
+		scala.collection.mutable.Map<String, String> conf = JavaConversions.mapAsScalaMap(config);
+		DataFrame df = sqlContext.baseRelationToDataFrame(new SidewinderDataFrame(sqlContext, null));
 		df.registerTempTable("root");
-		sqlContext.sql("select tags from root where value>5 and value<10").show();
-		ctx.close();
+		sqlContext.sql(
+				"select * from root where timestamp > 1000 limit 10")
+				.show();
 	}
 
 }

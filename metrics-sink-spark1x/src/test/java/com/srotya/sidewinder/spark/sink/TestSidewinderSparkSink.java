@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import com.srotya.sidewinder.core.storage.DataPoint;
 import com.srotya.sidewinder.core.utils.HTTPDataPointDecoder;
-import com.srotya.sidewinder.spark.sink.SidewinderSparkSink.SidewinderReporter;
 
 /**
  * @author ambud

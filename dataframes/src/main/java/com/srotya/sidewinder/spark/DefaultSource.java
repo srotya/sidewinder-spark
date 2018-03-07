@@ -40,12 +40,12 @@ public class DefaultSource implements RelationProvider, SchemaRelationProvider, 
 
 	@Override
 	public BaseRelation createRelation(SQLContext arg0, Map<String, String> arg1, StructType arg2) {
-		return new SidewinderDataFrame(arg0, arg1);
+		return new SidewinderDataFrame(arg0, arg1, arg2);
 	}
 
 	@Override
 	public BaseRelation createRelation(SQLContext arg0, SaveMode arg1, Map<String, String> arg2, DataFrame arg3) {
-		return new SidewinderDataFrame(arg0, arg2);
+		return new SidewinderDataFrame(arg0, arg1, arg2, arg3);
 	}
 
 }
